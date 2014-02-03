@@ -84,7 +84,7 @@ def main():
         for arg in argv:
             args += shlex.split(arg)
 
-        args, unknown = parser.parse_known_args(argv)
+        args, unknown = parser.parse_known_args(args)
         # print args, unknown
     
         # determine current console user
@@ -117,7 +117,7 @@ def main():
 
                 for path in args.add:
                     # when path starts with ~/, replace tilde with user_name
-                    if(path[0:2] == "~/"):
+                    if(path[0:2] == ("~" + os.sep)):
                         path = '~' + str(me.user_name) + path[1:]
                         
                     # Normalize path
@@ -133,7 +133,7 @@ def main():
 
                 for path in args.delete:
                     # when path starts with ~/, replace tilde with user_name
-                    if(path[0:2] == "~/"):
+                    if(path[0:2] == ("~" + os.sep)):
                         path = '~' + str(me.user_name) + path[1:]
                         
                     # Normalize path
