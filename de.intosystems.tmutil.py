@@ -1,7 +1,10 @@
 #!/usr/bin/python
 import CoreFoundation
-import sys, os, pwd
-import argparse, shlex
+import sys
+import os
+import pwd
+import argparse
+import shlex
 
 
 class UserManager(object):
@@ -23,12 +26,8 @@ class UserManager(object):
         return pwd.getpwuid(uid)
 
 
-
 def forced(key, applicationID):
     return CoreFoundation.CFPreferencesAppValueIsForced(key, applicationID)
-        
-        
-        
 
 def getPrefs(key, applicationID, userName=CoreFoundation.kCFPreferencesAnyUser, hostName=CoreFoundation.kCFPreferencesCurrentHost):
     value = CoreFoundation.CFPreferencesCopyValue(
@@ -39,9 +38,6 @@ def getPrefs(key, applicationID, userName=CoreFoundation.kCFPreferencesAnyUser, 
     )
     return list(value) if value else []
 
-
-
-
 def setPrefs(key, value, applicationID, userName=CoreFoundation.kCFPreferencesAnyUser, hostName=CoreFoundation.kCFPreferencesCurrentHost):
     return CoreFoundation.CFPreferencesSetValue(
         key,
@@ -50,18 +46,13 @@ def setPrefs(key, value, applicationID, userName=CoreFoundation.kCFPreferencesAn
         userName,
         hostName
     )
-    
-
 
 def syncPrefs(applicationID, userName=CoreFoundation.kCFPreferencesAnyUser, hostName=CoreFoundation.kCFPreferencesCurrentHost):
-    # return CoreFoundation.CFPreferencesAppSynchronize(applicationID)
     return CoreFoundation.CFPreferencesSynchronize(
        applicationID,
        userName,
        hostName
     )
-
-
 
 def main():
 
@@ -72,21 +63,26 @@ def main():
         return -1
         
     else:
-        # 12 args looks like casper suite
-        if len(sys.argv) == 12:
-            # casper: ignoring (mountpoint, computername, username)
-
-            # merge parameters into argv
-            argv = shlex.split(sys.argv[4])
-            # print "Casper", argv
-        else:
-            # standard: ignoring script name
-            argv = sys.argv[1:]
 
         parser = argparse.ArgumentParser(description='Provides administrative tools for intosystems.')
         parser.add_argument('-c', '--clean', action='store_true', help='Clean forced Time Machine settings')
         parser.add_argument('-a', '--add', nargs='*', help='Add Time Machine exclusion')
         parser.add_argument('-d', '--delete', nargs='*', help='Delete Time Machine exclusion')
+
+        # 12 args looks like casper suite
+        if len(sys.argv) == 12:
+            # casper: ignoring (mountpoint, computername, username)
+            argv = sys.argv[4:]
+        else:
+            # standard: ignoring script name
+            argv = sys.argv[1:]
+
+        # initialize args
+        args = []
+    
+        # split arguments like bash would do
+        for arg in argv:
+            args += shlex.split(arg)
 
         args, unknown = parser.parse_known_args(argv)
         print args, unknown
