@@ -85,7 +85,7 @@ def main():
             args += shlex.split(arg)
 
         args, unknown = parser.parse_known_args(argv)
-        print args, unknown
+        # print args, unknown
     
         # determine current console user
         me = UserManager()
@@ -145,7 +145,7 @@ def main():
                     else:
                         print "Ignoring", path
 
-            print setPrefs(keyExclude, excludesByPath, applicationID)
+            setPrefs(keyExclude, excludesByPath, applicationID)
             
             if(syncPrefs(applicationID)):
                 print "New settings", getPrefs(keyExclude, applicationID)
