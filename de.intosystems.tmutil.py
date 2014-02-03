@@ -116,13 +116,12 @@ def main():
             if args.add:
 
                 for path in args.add:
-                    # when path starts with ~ add user_name
-                    if(path[0] == "~"):
+                    # when path starts with ~/, replace tilde with user_name
+                    if(path[0:2] == "~/"):
                         path = '~' + str(me.user_name) + path[1:]
                         
-                    # when path ends with / remove /
-                    if(path[-1] == "/"):
-                        path = path[:-1]
+                    # Normalize path
+                    path = os.path.normpath(path)
 
                     if(path in excludesByPath):
                         print "Ignoring", path
@@ -133,13 +132,12 @@ def main():
             if args.delete:
 
                 for path in args.delete:
-                    # when path starts with ~ add user_name
-                    if(path[0] == "~"):
+                    # when path starts with ~/, replace tilde with user_name
+                    if(path[0:2] == "~/"):
                         path = '~' + str(me.user_name) + path[1:]
-
-                    # when path ends with / remove /
-                    if(path[-1] == "/"):
-                        path = path[:-1]
+                        
+                    # Normalize path
+                    path = os.path.normpath(path)
                         
                     if(path in excludesByPath):
                         print "Removing", path
