@@ -1,6 +1,9 @@
 #!/usr/bin/python
-import sys, os, pwd
-import argparse, shlex
+import sys
+import os
+import pwd
+import argparse
+import shlex
 import plistlib
 
 
@@ -23,7 +26,7 @@ class UserManager(object):
         return pwd.getpwuid(uid)
         
     def home_dir(self):
-        return self.user_info.pw_dir
+        return os.path.expanduser('~' + self.user_name)
 
 
 def main():
@@ -36,22 +39,26 @@ def main():
         
     else:
         
-        # 12 args looks like casper suite
-        if len(sys.argv) == 12:
-            # casper: ignoring (mountpoint, computername, username)
-
-            # merge parameters into argv
-            argv = shlex.split(sys.argv[4])
-            # print "Casper", argv
-        else:
-            # standard: ignoring script name
-            argv = sys.argv[1:]
-
         parser = argparse.ArgumentParser(description='Provides administrative tools for intosystems.')
         parser.add_argument('-a', '--add', nargs='*', help='Add Spotlight exclusion')
         parser.add_argument('-d', '--delete', nargs='*', help='Delete Spotlight exclusion')
 
-        args, unknown = parser.parse_known_args(argv)
+        # 12 args looks like casper suite
+        if len(sys.argv) == 12:
+            # casper: ignoring (mountpoint, computername, username)
+            argv = sys.argv[4:]
+        else:
+            # standard: ignoring script name
+            argv = sys.argv[1:]
+
+        # initialize args
+        args = []
+    
+        # split arguments like bash would do
+        for arg in argv:
+            args += shlex.split(arg)
+
+        args, unknown = parser.parse_known_args(args)
         print args, unknown
     
         # determine current console user
@@ -76,13 +83,11 @@ def main():
 
                 for path in args.add:
                     # when path starts with ~ add user_name
-                    if(path[0] == "~"):
-                        
+                    if(path[0:2] == ("~" + os.sep)):
                         path = os.path.join(me.home_dir(), path[2:])
                         
-                    # when path ends with / remove /
-                    if(path[-1] == "/"):
-                        path = path[:-1]
+                    # Normalize path
+                    path = os.path.normpath(path)
 
                     if(path in my_exclusions):
                         print "Ignoring", path
@@ -94,12 +99,11 @@ def main():
 
                 for path in args.delete:
                     # when path starts with ~ add user_name
-                    if(path[0] == "~"):
+                    if(path[0:2] == ("~" + os.sep)):
                         path = os.path.join(me.home_dir(), path[2:])
 
-                    # when path ends with / remove /
-                    if(path[-1] == "/"):
-                        path = path[:-1]
+                    # Normalize path
+                    path = os.path.normpath(path)
                         
                     if(path in my_exclusions):
                         print "Removing", path
