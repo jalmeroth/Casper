@@ -59,7 +59,7 @@ def main():
             args += shlex.split(arg)
 
         args, unknown = parser.parse_known_args(args)
-        print args, unknown
+        # print args, unknown
     
         # determine current console user
         me = UserManager()
