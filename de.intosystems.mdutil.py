@@ -2,9 +2,10 @@
 import sys
 import os
 import pwd
-import argparse
 import shlex
+import argparse
 import plistlib
+import subprocess
 
 
 class UserManager(object):
@@ -69,13 +70,20 @@ def main():
             spotlight_config = "/.Spotlight-V100/VolumeConfiguration.plist"
         
             try:
-                spotlight_data = plistlib.readPlist(spotlight_config)
+                p = subprocess.Popen(['/usr/bin/plutil','-convert','xml1', '-o', '-', spotlight_config], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                out_data, err_data = p.communicate()
+                
+                if(p.returncode == 0):
+                    spotlight_data = plistlib.readPlistFromString(out_data)
+                else:
+                    spotlight_data = {}
+                    
             except IOError as e:
                 # file could not be found
                 print e
                 # creating our own data
                 spotlight_data = {}
-        
+                
             my_exclusions = spotlight_data.get('Exclusions', [])
             print "Current settings", my_exclusions
 
